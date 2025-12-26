@@ -1,71 +1,161 @@
-# api-lab README
+# API Lab – VS Code Extension
 
-This is the README for your extension "api-lab". After writing up a brief description, we recommend including the following sections.
-
-## Features
-
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+API Lab is a lightweight Visual Studio Code extension for creating, executing, and inspecting HTTP/HTTPS requests directly inside the editor.  
+It helps developers test and debug APIs without switching to external tools.
 
 ---
 
-## Following extension guidelines
+## Features
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+- Execute HTTP/HTTPS requests from `.http` files
+- Supports common HTTP methods (GET, POST, PUT, DELETE)
+- Custom headers and JSON request bodies
+- Environment variable substitution using `{{VAR_NAME}}`
+- Authenticated requests via standard HTTP headers (e.g., Bearer tokens)
+- Webview-based response viewer displaying:
+  - Status code
+  - Response headers
+  - Response body
+  - Request latency
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+---
 
-## Working with Markdown
+## Installation
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+### Option 1: Install via VSIX (Recommended)
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+1. Download the `.vsix` file
+2. Open VS Code
+3. Go to **Extensions**
+4. Click the `…` menu → **Install from VSIX**
+5. Select the file and reload VS Code
 
-## For more information
+### Option 2: Run from Source (Development)
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+1. Clone the repository
+2. Open the project in VS Code
+3. Press **F5** to launch the Extension Development Host
 
-**Enjoy!**
+---
+
+## Usage
+
+### 1. Create a request file
+
+Create a file with the `.http` extension:
+
+```http
+GET https://httpbin.org/get
+Accept: application/json
+```
+
+---
+
+### 2. Run the request
+
+1. Click inside the `.http` file
+2. Press **Ctrl + Shift + P**
+3. Run:
+
+```
+API Lab: Send HTTP Request
+```
+
+---
+
+### 3. View the response
+
+The response opens in a side panel showing:
+- Status code
+- Response headers
+- Response body (formatted JSON if applicable)
+- Time taken for the request
+
+---
+
+##  Environment Variables
+
+API Lab supports environment-based configuration using a JSON file.
+
+### Create `api-lab.env.json` in the workspace root:
+
+```json
+{
+  "BASE_URL": "https://jsonplaceholder.typicode.com",
+  "TOKEN": "example-token"
+}
+```
+
+### Use variables in requests:
+
+```http
+GET {{BASE_URL}}/posts/1
+Authorization: Bearer {{TOKEN}}
+Accept: application/json
+```
+
+This allows the same request definitions to be reused across different environments such as development, QA, and production.
+
+---
+
+## Authentication
+
+Authentication is handled via standard HTTP headers.
+
+Example (Bearer token):
+
+```http
+Authorization: Bearer {{TOKEN}}
+```
+
+Secrets can be externalized using environment variables to avoid hardcoding sensitive values.
+
+---
+
+##  Design Overview
+
+High-level flow:
+
+```
+Editor (.http file)
+   ↓
+Command Palette
+   ↓
+Request Parser
+   ↓
+HTTP Client (Axios)
+   ↓
+Response
+   ↓
+Webview Renderer
+```
+
+The extension is designed with separation of concerns and can be extended with additional features such as request collections or assertions.
+
+---
+
+## Tech Stack
+
+- TypeScript
+- VS Code Extension API
+- Axios
+- Webviews
+- Webpack
+
+---
+
+##  Error Handling
+
+API Lab clearly differentiates between:
+- HTTP errors (non-2xx responses)
+- Network failures (request sent but no response received)
+- Invalid request definitions
+
+Errors are reported to the user with clear messages instead of failing silently.
+
+---
+
+##  Why API Lab?
+
+API Lab is built as a developer-first tool focused on productivity.  
+It integrates API testing directly into the editor, enabling faster feedback loops and a smoother development workflow.
