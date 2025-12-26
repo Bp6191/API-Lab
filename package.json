@@ -5,6 +5,8 @@
   "version": "0.0.1",
 
   "main": "./dist/extension.js",
+  "license": "MIT",
+
 
   "engines": {
     "vscode": "^1.107.0"
