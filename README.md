@@ -1,283 +1,155 @@
-# API Lab – VS Code Extension
+# API Lab
 
-API Lab is a lightweight Visual Studio Code extension for creating, executing, and inspecting HTTP/HTTPS requests directly inside the editor.  
-It helps developers test and debug APIs without switching to external tools.
+**Send HTTP requests directly from VS Code — no extra apps, no context switching.**
 
----
-## Tech Stack
+API Lab lets you write and execute HTTP requests in plain `.http` files, with responses displayed instantly in a dedicated side panel. Built for developers who want a lightweight, distraction-free alternative to Postman or Insomnia without leaving their editor.
 
-- TypeScript
-- VS Code Extension API
-- Axios
-- Webviews
-- Webpack
 ---
 
 ## Features
 
-- Execute HTTP/HTTPS requests from `.http` files
-- Supports common HTTP methods (GET, POST, PUT, DELETE)
-- Custom headers and JSON request bodies
-- Environment variable substitution using `{{VAR_NAME}}`
-- Authenticated requests via standard HTTP headers (e.g., Bearer tokens)
-- Webview-based response viewer displaying:
-  - Status code
-  - Response headers
-  - Response body
-  - Request latency
+- **Zero setup** — open a `.http` file, write a request, and send it
+- **Full HTTP method support** — GET, POST, PUT, DELETE, PATCH, and more
+- **Environment variables** — define reusable values for URLs, tokens, and keys in `api-lab.env.json`
+- **Rich response panel** — view status code, headers, formatted body, and response time
+- **Authentication support** — Bearer tokens, Basic Auth, API keys, and any custom header
+- **Clear error reporting** — distinguishes between HTTP errors, network failures, and malformed requests
 
 ---
 
-## Installation
+## Requirements
 
-### Option 1: Install via VSIX (Recommended)
+- Visual Studio Code `^1.107.0`
 
-1. Download the `.vsix` file
-2. Open VS Code
-3. Go to **Extensions**
-4. Click the `…` menu → **Install from VSIX**
-5. Select the file and reload VS Code
-
-### Option 2: Run from Source (Development)
-
-1. Clone the repository
-2. Open the project in VS Code
-3. Press **F5** to launch the Extension Development Host
+No additional runtime dependencies. Install and go.
 
 ---
 
-# Usage
+## Quick Start
 
-## 1. Create a request file
+**1.** Create a file with a `.http` extension (e.g., `requests.http`)
 
-Create a file with the `.http` extension:
+**2.** Write a request:
 
-### HTTP Request Examples (API Lab)
-
----
-
-## GET Requests
-
-Retrieve data from a server.
-
-### Basic GET Request
 ```http
-GET https://jsonplaceholder.typicode.com/posts/1
-Accept: application/json
-```
-
- Fetches a single post with ID 1. The `Accept` header tells the server we want JSON response.
-
-### GET with Variables
-```http
-GET {{BASE_URL}}/posts/1
-Authorization: Bearer {{TOKEN}}
-Accept: application/json
-```
-
- Uses environment variables for the base URL and authentication token. Variables are defined in your environment file.
-
----
-
-## POST Requests
-
-Create new resources on the server.
-
-### POST with JSON Body
-```http
-POST https://jsonplaceholder.typicode.com/posts
-Content-Type: application/json
-
-{
-  "title": "API Lab",
-  "body": "Testing POST request",
-  "userId": 1
-}
-```
-
- Creates a new post. The `Content-Type: application/json` header tells the server we're sending JSON data. Note the blank line between headers and body.
-
-### POST with Query Parameters
-```http
-POST https://api.example.com/search?limit=10&sort=desc
-Content-Type: application/json
-
-{
-  "query": "api testing"
-}
-```
-
- Combines query parameters in the URL with a JSON body. Useful for filtering or pagination alongside data submission.
-
-### POST with Custom Headers
-```http
-POST https://api.example.com/data
-Content-Type: application/json
-X-Client-Id: api-lab
-X-Request-Source: vscode
-
-{
-  "value": 42
-}
-```
-
- Adds custom headers for client identification or tracking. Many APIs require specific headers for authentication or analytics.
-
-### POST with No Body
-```http
-POST https://api.example.com/trigger
-Authorization: Bearer {{TOKEN}}
-```
-
- Some POST endpoints don't require a body (like triggering webhooks or actions). Just include the headers.
-
----
-
-## PUT Requests
-
-Replace an entire resource.
-
-### Full Resource Update
-```http
-PUT https://jsonplaceholder.typicode.com/posts/1
-Content-Type: application/json
-
-{
-  "id": 1,
-  "title": "Updated Title",
-  "body": "Updated content",
-  "userId": 1
-}
-```
-
- Replaces the entire post with ID 1. PUT typically requires all fields, even if only one is changing.
-
----
-
-## PATCH Requests
-
-Partially update a resource.
-
-### Partial Resource Update
-```http
-PATCH https://jsonplaceholder.typicode.com/posts/1
-Content-Type: application/json
-
-{
-  "title": "Partially Updated Title"
-}
-```
-
- Updates only the `title` field. PATCH is more efficient when you only need to change specific fields.
-
----
-
-## DELETE Requests
-
-Remove resources from the server.
-
-### Delete with Authentication
-```http
-DELETE https://jsonplaceholder.typicode.com/posts/1
-Authorization: Bearer {{TOKEN}}
-```
-
- Deletes the post with ID 1. Most DELETE endpoints require authentication to prevent unauthorized deletions.
-
----
-
-## HEAD Requests
-
-Retrieve headers without the response body.
-
-### Check Resource Metadata
-```http
-HEAD https://jsonplaceholder.typicode.com/posts/1
-```
-
- Returns only the headers (like `Content-Type`, `Content-Length`) without the actual data. Useful for checking if a resource exists or getting metadata.
-
----
-
-## OPTIONS Requests
-
-Discover what HTTP methods are supported.
-
-### Check Available Methods
-```http
-OPTIONS https://jsonplaceholder.typicode.com/posts
-```
-
- Returns the allowed HTTP methods (GET, POST, etc.) for the endpoint. Useful for API discovery and CORS preflight requests.
-
----
-
-## Multiple Requests
-
-Execute multiple requests in sequence from a single file.
-
-### Chained Requests
-```http
-# Get all posts
 GET https://httpbin.org/get
-
-###
-
-# Create a new post
-POST https://httpbin.org/post
-Content-Type: application/json
-
-{
-  "tool": "API Lab"
-}
-
-###
-
-# Delete a post
-DELETE https://httpbin.org/delete
-Authorization: Bearer {{TOKEN}}
+Accept: application/json
 ```
 
- Use `###` as a separator between requests. Only the request where your cursor is positioned will execute when you run it.
-
----
-
-## 2. Run the request
-
-1. Click inside the `.http` file
-2. Press **Ctrl + Shift + P**
-3. Run:
+**3.** Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and run:
 
 ```
 API Lab: Send HTTP Request
 ```
 
----
-
-## 3. View the response
-
-The response opens in a side panel showing:
-- Status code
-- Response headers
-- Response body (formatted JSON if applicable)
-- Time taken for the request
+**4.** The response opens in a side panel.
 
 ---
 
-##  Environment Variables
+## Organizing Your Request Files
 
-API Lab supports environment-based configuration using a JSON file.
+`.http` files are just plain text — they live in your project like any other file. A common approach is to keep them in a dedicated folder:
 
-### Create `api-lab.env.json` in the workspace root:
+```
+my-project/
+├── src/
+├── requests/
+│   ├── users.http
+│   ├── posts.http
+│   └── auth.http
+├── api-lab.env.json
+└── package.json
+```
+
+These files double as **API documentation** — new team members can open them and immediately see every endpoint, what headers are needed, and what the payloads look like.
+
+**Want to commit them?** Go ahead — they're useful for the whole team.
+
+**Want to keep them local?** Add this to your `.gitignore`:
+
+```
+*.http
+api-lab.env.json
+```
+
+---
+
+## Request Format
+
+Requests follow a simple, standard structure:
+
+```
+METHOD URL
+Header: Value
+Header: Value
+
+Request body (optional)
+```
+
+A blank line separates headers from the body. That is the only formatting requirement.
+
+---
+
+## Examples
+
+### GET
+
+```http
+GET https://jsonplaceholder.typicode.com/posts/1
+Accept: application/json
+```
+
+### POST
+
+```http
+POST https://jsonplaceholder.typicode.com/posts
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Hello World",
+  "body": "This is a new post.",
+  "userId": 1
+}
+```
+
+### PUT
+
+```http
+PUT https://jsonplaceholder.typicode.com/posts/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": 1,
+  "title": "Updated Title",
+  "body": "Updated content.",
+  "userId": 1
+}
+```
+
+### DELETE
+
+```http
+DELETE https://jsonplaceholder.typicode.com/posts/1
+Accept: application/json
+```
+
+---
+
+## Environment Variables
+
+Store shared values — base URLs, tokens, API keys — in an `api-lab.env.json` file at your workspace root:
 
 ```json
 {
   "BASE_URL": "https://jsonplaceholder.typicode.com",
-  "TOKEN": "example-token"
+  "TOKEN": "your-token-here",
+  "API_KEY": "your-api-key-here"
 }
 ```
 
-### Use variables in requests:
+Reference them in any `.http` file using `{{VARIABLE_NAME}}` syntax:
 
 ```http
 GET {{BASE_URL}}/posts/1
@@ -285,65 +157,62 @@ Authorization: Bearer {{TOKEN}}
 Accept: application/json
 ```
 
-This allows the same request definitions to be reused across different environments such as development, QA, and production.
+API Lab resolves variables at send time. This makes it straightforward to switch between environments (development, staging, production) by updating a single file.
+
+> **Note:** Add `api-lab.env.json` to `.gitignore` to keep secrets out of version control.
 
 ---
 
 ## Authentication
 
-Authentication is handled via standard HTTP headers.
-
-Example (Bearer token):
+Set authentication via request headers. Common patterns:
 
 ```http
+# Bearer token
 Authorization: Bearer {{TOKEN}}
+
+# Basic Auth (Base64-encoded credentials)
+Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=
+
+# API Key
+X-API-Key: {{API_KEY}}
 ```
 
-Secrets can be externalized using environment variables to avoid hardcoding sensitive values.
+All header-based authentication schemes are supported.
 
 ---
 
-##  Error Handling
+## Response Panel
 
-API Lab clearly differentiates between:
-- HTTP errors (non-2xx responses)
-- Network failures (request sent but no response received)
-- Invalid request definitions
+After a request is sent, the response panel displays:
 
-Errors are reported to the user with clear messages instead of failing silently.
+| Field | Description |
+|-------|-------------|
+| **Status** | HTTP status code and reason phrase (e.g., `200 OK`, `404 Not Found`) |
+| **Headers** | All response headers returned by the server |
+| **Body** | Response payload — JSON is automatically pretty-printed |
+| **Time** | Total round-trip duration in milliseconds |
+
+---
+
+## Error Handling
+
+API Lab surfaces three distinct error categories:
+
+| Error | Cause |
+|-------|-------|
+| **HTTP Error** | Server responded with a non-2xx status code |
+| **Network Failure** | Request was sent but no response was received (server unreachable, no connectivity) |
+| **Invalid Request** | Malformed `.http` file — missing URL, bad syntax, or unsupported format |
 
 ---
 
-##  Why API Lab?
+## Contributing
 
-API Lab is built as a developer-first tool focused on productivity.  
-It integrates API testing directly into the editor, enabling faster feedback loops and a smoother development workflow.
+Bug reports and feature requests are welcome via [GitHub Issues](https://github.com/bharathipandurangan/api-lab/issues).
 
 ---
-## Important Notes
 
-### Headers and Body Separation
-- **Always include a blank line between headers and the request body**
-- Missing this line will cause the body to be interpreted as headers
+## License
 
-### Content-Type Header
-- Use `Content-Type: application/json` for JSON payloads
-- Use `Content-Type: application/x-www-form-urlencoded` for form data
-- Use `Content-Type: multipart/form-data` for file uploads
-
-### Environment Variables
-- Define variables in your environment file: `BASE_URL`, `TOKEN`, etc.
-- Reference them in requests using `{{VARIABLE_NAME}}`
-- Keeps sensitive data like tokens out of your request files
-
-### Request Execution
-- Only the request under your cursor executes
-- Use keyboard shortcuts or the "Send Request" button
-- Responses appear in a separate panel
-
-### Common Headers
-- `Authorization: Bearer {{TOKEN}}` - JWT authentication
-- `Accept: application/json` - Expected response format
-- `User-Agent: API-Lab/1.0` - Client identification
-- `X-API-Key: {{API_KEY}}` - API key authentication
-
+[MIT](LICENSE)
